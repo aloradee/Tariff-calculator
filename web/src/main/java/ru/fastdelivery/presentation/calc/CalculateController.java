@@ -11,12 +11,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.fastdelivery.domain.common.currency.CurrencyFactory;
+import ru.fastdelivery.domain.common.location.Coordinates;
 import ru.fastdelivery.domain.common.volume.Volume;
 import ru.fastdelivery.domain.common.weight.Weight;
 import ru.fastdelivery.domain.delivery.pack.Pack;
 import ru.fastdelivery.domain.delivery.shipment.Shipment;
 import ru.fastdelivery.presentation.api.request.CalculatePackagesRequest;
 import ru.fastdelivery.presentation.api.request.CargoPackage;
+import ru.fastdelivery.presentation.api.request.CoordinatesDto;
 import ru.fastdelivery.presentation.api.response.CalculatePackagesResponse;
 import ru.fastdelivery.usecase.TariffCalculateUseCase;
 
@@ -36,13 +38,19 @@ public class CalculateController {
     })
     public CalculatePackagesResponse calculate(
             @Valid @RequestBody CalculatePackagesRequest request) {
+
         var packs = request.packages().stream()
                 .map(this::createPack)
                 .toList();
 
         var shipment = new Shipment(packs, currencyFactory.create(request.currencyCode()));
-        var calculatedPrice = tariffCalculateUseCase.calc(shipment);
+
+        var departure = createCoordinates(request.departure());
+        var destination = createCoordinates(request.destination());
+
+        var calculatedPrice = tariffCalculateUseCase.calc(shipment, departure, destination);
         var minimalPrice = tariffCalculateUseCase.minimalPrice();
+
         return new CalculatePackagesResponse(calculatedPrice, minimalPrice);
     }
 
@@ -52,8 +60,12 @@ public class CalculateController {
                 cargoPackage.length(),
                 cargoPackage.width(),
                 cargoPackage.height()
-        ).normalize(); // Нормализуем габариты
+        ).normalize();
 
         return new Pack(weight, volume);
+    }
+
+    private Coordinates createCoordinates(CoordinatesDto dto) {
+        return new Coordinates(dto.latitude(), dto.longitude());
     }
 }

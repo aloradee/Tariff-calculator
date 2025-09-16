@@ -1,10 +1,18 @@
 currency:
   available:
-    - "RUB"
-    - "USD"
-    - "EUR"
+    - RUB
+    - USD
+    - EUR
+
 cost:
   rub:
     perKg: 50.0
     minimal: 500.0
     perCubicMeter: 10000.0
+
+coordinates:
+  minLatitude: 45.0
+  maxLatitude: 65.0
+  minLongitude: 30.0
+  maxLongitude: 96.0
+  distanceThreshold: 450
