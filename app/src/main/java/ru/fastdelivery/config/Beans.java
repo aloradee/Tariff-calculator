@@ -19,7 +19,9 @@ public class Beans {
     }
 
     @Bean
-    public TariffCalculateUseCase tariffCalculateUseCase(WeightPriceProvider weightPriceProvider) {
-        return new TariffCalculateUseCase(weightPriceProvider);
+    public TariffCalculateUseCase tariffCalculateUseCase(
+            WeightPriceProvider weightPriceProvider,
+            VolumePriceProvider volumePriceProvider) {
+        return new TariffCalculateUseCase(weightPriceProvider, volumePriceProvider);
     }
 }
